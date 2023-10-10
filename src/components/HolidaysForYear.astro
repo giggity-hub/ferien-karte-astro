@@ -1,0 +1,62 @@
+---
+import Holiday from './Holiday.astro';
+import {dateToPercentageOfYearFactory} from '../utils'
+
+interface Props{
+    year: string
+    holidays: HolidaysForYear
+}
+
+const {year, holidays} = Astro.props;
+
+const dateToPercentage = dateToPercentageOfYearFactory(year)
+
+function calculateWidth(start: Date, end: Date){
+    return dateToPercentage(end) - dateToPercentage(start)
+}
+---
+
+<div class="inline-block w-full bg-red-200">
+    {Object.entries(holidays).map(([bid, holidaysForCountyForYear])=>( 
+        <div data-bundesland={bid} class="holiday-table__row relative h-7">
+            {holidaysForCountyForYear.map((h, index) => ( 
+                <Holiday 
+                    left={dateToPercentage(new Date(h.start))} 
+                    width={calculateWidth(new Date(h.start), new Date(h.end))}
+                    id={h.id}/>
+            ))}
+        </div>
+    ))}
+</div>
+
+<style>
+    .holiday-table__row{
+        background: blue;
+    }
+    .holiday-table__row.is-hover{
+        background: purple;
+    }
+</style>
+
+<script>
+    import {mouseOverBundesland} from '../customstore'
+
+    mouseOverBundesland.listen((newValue, oldValue)=>{
+        if (oldValue){
+            const $prev = document.querySelector(`.holiday-table__row[data-bundesland="${oldValue}"]`)
+            $prev?.classList.remove('is-hover')
+        }
+        if (newValue){
+            const $cur = document.querySelector(`.holiday-table__row[data-bundesland="${newValue}"]`)
+            $cur?.classList.add('is-hover')
+        }
+    })
+    
+    document.querySelectorAll('.holiday-table__row').forEach(el => {
+        (el as HTMLDivElement).addEventListener('mouseover', (e)=>{
+            const $el = e.currentTarget as HTMLDivElement
+            const bid = $el.getAttribute('data-bundesland')
+            mouseOverBundesland.value = bid
+        })
+    })
+</script>

@@ -1,0 +1,35 @@
+---
+import HolidaysForYear from "./HolidaysForYear.astro";
+interface Props{
+    holidays: HolidayData
+}
+
+const {holidays} = Astro.props
+
+---
+
+<!-- The font size has to be zero because inline-block elements (HolidaysForYear) have a space between them -->
+<div class="whitespace-nowrap overflow-x-hidden" style="font-size:0">
+    {Object.entries(holidays).map(([year, holidaysForYear]) => ( 
+        <HolidaysForYear year={year} holidays={holidaysForYear}/>
+    ))}
+</div>
+
+<script>
+import { currentHolidays } from "../customstore";
+
+currentHolidays.subscribe((newVal, oldVal) => {
+    // console.log(newVal, oldVal);
+    if (newVal?.id){
+        document.querySelectorAll(`[data-id="${newVal.id}"]`).forEach(el => {
+            el.classList.add('active')
+        })
+    }
+    if (oldVal?.id){
+        document.querySelectorAll(`[data-id="${oldVal.id}"]`).forEach(el => {
+            el.classList.remove('active')
+        })
+    }
+    
+})
+</script>

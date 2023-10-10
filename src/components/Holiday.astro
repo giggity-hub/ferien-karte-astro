@@ -1,0 +1,18 @@
+---
+interface Props {
+    left: number,
+    width: number,
+    id: string,
+}
+
+const {left, width, id} = Astro.props
+---
+
+<div id={id} data-id={id} class="absolute bg-black h-5" style={{left: left + '%', width: width + '%'}}>
+</div>
+
+<style>
+    .active{
+        background: red;
+    }
+</style>
