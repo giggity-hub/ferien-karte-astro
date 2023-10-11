@@ -10,8 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/alpinejs": "^0.3.1",
     "@astrojs/svelte": "^4.0.2",
     "@astrojs/tailwind": "^5.0.0",
+    "@types/alpinejs": "^3.13.2",
+    "alpinejs": "^3.13.1",
     "astro": "^3.2.0",
     "d3": "^7.8.5",
     "nanostores": "^0.9.3",
