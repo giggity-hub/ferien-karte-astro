@@ -1,6 +1,6 @@
 const bundeslaender = ['BW', 'BY',"BE","BB",'HB','HH','HE','MV','NI','NW','RP','SL','SN','ST','SH','TH']
 
-import { currentHolidays } from "../customstore";
+
 import { holidays } from "../data";
 import { State, DictState } from "../utils";
 

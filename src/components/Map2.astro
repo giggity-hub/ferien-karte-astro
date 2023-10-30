@@ -48,41 +48,41 @@ const $tooltip = document.getElementById('tooltip')!
 const $popoverAnchor = document.getElementById('popover-anchor')!
 const $map = document.getElementById('holiday-map')!
 
-function togglePopoverFor(bid){
+// function togglePopoverFor(bid){
     
-    const data: BundeslandInfo = {
-        fullname: 'boi',
-        bid,
-        imagePath: `./coat-of-arms/${bid}.svg`,
-        holiday: app.$currentHolidayIn.getKey(bid)
-    }
-    $popoverAnchor.innerHTML = renderPopover(data)
-    $tooltip.show(event)
-}
+//     const data: BundeslandInfo = {
+//         fullname: 'boi',
+//         bid,
+//         imagePath: `./coat-of-arms/${bid}.svg`,
+//         holiday: app.$currentHolidayIn.getKey(bid)
+//     }
+//     $popoverAnchor.innerHTML = renderPopover(data)
+//     $tooltip.show(event)
+// }
 
 
 
-document.addEventListener('click', (e)=>{
-    // console.log(e.target)
-    const targetIsPath = e.target.nodeName.toLowerCase() == 'path'
+// document.addEventListener('click', (e)=>{
+//     // console.log(e.target)
+//     const targetIsPath = e.target.nodeName.toLowerCase() == 'path'
     
-    console.log(targetIsPath)
-    if (targetIsPath) {
-        const bid = e.target.getAttribute('data-bundesland')
-        togglePopoverFor(bid)
-    }else{
-        $tooltip.hide()
-    }
-})
+//     console.log(targetIsPath)
+//     if (targetIsPath) {
+//         const bid = e.target.getAttribute('data-bundesland')
+//         togglePopoverFor(bid)
+//     }else{
+//         $tooltip.hide()
+//     }
+// })
 
-document.querySelectorAll('path').forEach(el =>{
-    const bid = el.getAttribute('data-bundesland')
-    el.addEventListener('click', togglePopoverFor)
+// document.querySelectorAll('path').forEach(el =>{
+//     const bid = el.getAttribute('data-bundesland')
+//     el.addEventListener('click', togglePopoverFor)
 
-    el.addEventListener('mouseenter', ()=>{
-        app.$hoveredBundeslandId.value = bid;
-    })
-})
+//     el.addEventListener('mouseenter', ()=>{
+//         app.$hoveredBundeslandId.value = bid;
+//     })
+// })
 
 
 let $hoveredPathElement: SVGPathElement | null = null;
@@ -114,9 +114,9 @@ app.$currentHolidayIn.subscribe((newVal, oldVal, bid) =>{
 </script>
 <div id="tooltip-bounds" class="relative">
 
-    <bounded-tooltip id="tooltip" for="#tooltip-bounds" class="my-tooltip-stuhltip">
+    <!-- <bounded-tooltip id="tooltip" for="#tooltip-bounds" class="my-tooltip-stuhltip">
         <div id="popover-anchor"></div>
-    </bounded-tooltip>
+    </bounded-tooltip> -->
 
     <svg id="holiday-map" viewBox=`0 0 ${width} ${height}` style="max-height: 100vh;" class="">
         {bundeslaenderjson.features.map(x => {
