@@ -2,7 +2,8 @@
 import { holidays, bundeslaender } from "../data";
 import { dateToPercentageOfYearFactory } from "../utils";
 
-const years = Object.keys(holidays).toSorted().map(x => parseInt(x))
+// const years = Object.keys(holidays).toSorted().map(x => parseInt(x))
+const years = [2023, 2024, 2025]
 const firstDate = + new Date(years[0], 0, 1)
 const lastDate = + new Date(years[years.length -1], 11, 31)
 

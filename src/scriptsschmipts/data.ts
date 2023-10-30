@@ -18,7 +18,8 @@ class AppState{
     years
 
     constructor(holidays: HolidayData){
-        this.years = Object.keys(holidays).toSorted().map(x => parseInt(x))
+        // this.years = Object.keys(holidays).toSorted().map(x => parseInt(x))
+        this.years = [2023, 2024, 2025]
         this.$selectedDate.listen(this.calculateCurrentHolidays.bind(this))
     }
     calculateCurrentHolidays(d: Date){
