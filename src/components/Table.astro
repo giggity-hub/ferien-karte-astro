@@ -1,0 +1,105 @@
+---
+import { holidays, bundeslaender } from "../data";
+import { dateToPercentageOfYearFactory } from "../utils";
+
+const years = Object.keys(holidays).toSorted().map(x => parseInt(x))
+const firstDate = + new Date(years[0], 0, 1)
+const lastDate = + new Date(years[years.length -1], 11, 31)
+
+const widthOf24hInPx = 5;
+const milliSecondsIn24h = 86400000
+
+function scale(dateTimeStamp: number){
+    return (dateTimeStamp/milliSecondsIn24h) * widthOf24hInPx
+}
+function calculateStyle(h: Holiday){
+    const start = +new Date(h.start)
+    const end = +new Date(h.end)
+    const left =  start - firstDate
+    const width = end - start
+    return {
+        left: scale(left) + 'px',
+        width: scale(width) + 'px'
+    }
+}
+
+---
+<div id="holiday-table" class="holiday-table bg-gray-600" style={{width: scale(lastDate - firstDate) + 'px'}}>
+    {bundeslaender.map(bid => ( 
+        <div data-bundesland={bid} class="relative holiday-table__row">
+            {Object.entries(holidays).map(([year, holidaysForYear])=>{
+                return holidaysForYear[bid].map(hol => (
+                    <div  data-holiday-id={hol.id} class="holiday absolute bg-red-500" style={calculateStyle(hol)}></div>
+                ))
+            })}
+        </div>
+    ))}
+</div>
+<script>
+    import { app } from "../scriptsschmipts/data"
+
+    const $elements = document.getElementsByClassName('holiday-table__row') as HTMLCollectionOf<HTMLDivElement>
+    for (const element of $elements) {
+        const bid = element.getAttribute('data-bundesland')
+        element.addEventListener('mouseenter', (e)=>{
+            app.$hoveredBundeslandId.value = bid;
+        })
+    }
+
+    const $table = document.getElementById('holiday-table')!
+    let $hoveredRow: HTMLElement | null = null;
+    app.$hoveredBundeslandId.subscribe(newVal=>{
+        $hoveredRow?.classList.remove('is-hover')
+        $hoveredRow = $table.querySelector(`[data-bundesland="${newVal}"]`)
+        $hoveredRow?.classList.add('is-hover')
+    })
+
+    const highlightedTableElements = {}
+    app.$currentHolidayIn.subscribe((newVal, oldVal, bid)=>{
+        if (highlightedTableElements[bid]) {
+            highlightedTableElements[bid].classList.remove('is-current')
+        }
+
+        if (newVal) {
+            const $newHolidayInTable = $table?.querySelector(`[data-holiday-id="${newVal.id}"]`)
+            $newHolidayInTable?.classList.add('is-current')
+            highlightedTableElements[bid] = $newHolidayInTable;
+        }else{
+            highlightedTableElements[bid] = null;
+        }
+    })
+
+
+
+
+</script>
+
+<style>
+    .holiday-table{
+        --holiday-table-row-height: 40px;
+        
+    }
+    .holiday-table__row{
+        height: var(--holiday-table-row-height);
+        margin-bottom: var(--holiday-table-row-gap);
+        /* padding-top: 30px; */
+    }
+    .holiday{
+        /* transform: translateY(calc(var(--holiday-table-row-height)/2)); */
+        top: 0;
+        bottom:0;
+        margin: auto 0;
+
+        border-radius: 1px;
+        background: red;
+        --box-shadow-spread: 5px;
+        height: 10px;
+        box-shadow: 0px 0px 0px var(--box-shadow-spread) #000000;
+    }
+    .holiday.is-current{
+        background: blue;
+    }
+    .holiday-table__row.is-hover{
+        background: hsl(200, 100%, 10%);
+    }
+</style>

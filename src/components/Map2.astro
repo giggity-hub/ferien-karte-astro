@@ -1,0 +1,158 @@
+---
+import bundeslaenderjson from '../bundeslaender.geo.json'
+import * as d3 from 'd3'
+
+let width = 800
+let height = 900
+
+let projection = d3.geoMercator().fitSize([width, height], bundeslaenderjson)
+let geoGenerator = d3.geoPath(projection)
+
+const getId = (x) => x.properties.id.split('-')[1]
+---
+<script>
+import {app} from '../scriptsschmipts/data'
+
+    interface BundeslandInfo {
+    fullname: string;
+    bid: string;
+    imagePath: string;
+    holiday?: {
+        start: string;
+        end: string;
+        holiday_type: string;
+    }
+}
+
+
+function renderPopover(data: BundeslandInfo){
+        return `
+        <div id="popover" class="h-32 w-56 flex absolute bg-yellow-700">
+            <img class="w-10" src="${data.imagePath}">
+            <div >
+                <h3>${data.fullname}</h3>
+                    ${ data.holiday && `
+                        <div>
+                            <p>${data.holiday.holiday_type}</p>
+                            <span>${data.holiday.start}</span>
+                            <span>-</span>
+                            <span >${data.holiday.end}</span>
+                        </div>
+                    `}
+            </div>
+        </div>
+        `
+    }
+
+const $tooltip = document.getElementById('tooltip')!
+const $popoverAnchor = document.getElementById('popover-anchor')!
+const $map = document.getElementById('holiday-map')!
+
+function togglePopoverFor(bid){
+    
+    const data: BundeslandInfo = {
+        fullname: 'boi',
+        bid,
+        imagePath: `./coat-of-arms/${bid}.svg`,
+        holiday: app.$currentHolidayIn.getKey(bid)
+    }
+    $popoverAnchor.innerHTML = renderPopover(data)
+    $tooltip.show(event)
+}
+
+
+
+document.addEventListener('click', (e)=>{
+    // console.log(e.target)
+    const targetIsPath = e.target.nodeName.toLowerCase() == 'path'
+    
+    console.log(targetIsPath)
+    if (targetIsPath) {
+        const bid = e.target.getAttribute('data-bundesland')
+        togglePopoverFor(bid)
+    }else{
+        $tooltip.hide()
+    }
+})
+
+document.querySelectorAll('path').forEach(el =>{
+    const bid = el.getAttribute('data-bundesland')
+    el.addEventListener('click', togglePopoverFor)
+
+    el.addEventListener('mouseenter', ()=>{
+        app.$hoveredBundeslandId.value = bid;
+    })
+})
+
+
+let $hoveredPathElement: SVGPathElement | null = null;
+app.$hoveredBundeslandId.subscribe(bid=>{
+    $hoveredPathElement?.classList.remove('is-hover')
+    $hoveredPathElement = $map.querySelector(`[data-bundesland="${bid}"]`)
+    $hoveredPathElement?.classList.add('is-hover')
+})
+
+
+const highlightedMapElements = {}
+const $holidayMap = document.getElementById('holiday-map')
+app.$currentHolidayIn.subscribe((newVal, oldVal, bid) =>{
+    
+    if (highlightedMapElements[bid]) {
+        highlightedMapElements[bid].classList.remove('is-current')
+    }
+
+    if (newVal) {
+        const $newHolidayInMap = $holidayMap?.querySelector(`[data-bundesland="${bid}"]`)
+        $newHolidayInMap?.classList.add('is-current')
+        highlightedMapElements[bid] = $newHolidayInMap;
+    }else{
+        highlightedMapElements[bid] = null;
+    }
+})
+
+
+</script>
+<div id="tooltip-bounds" class="relative">
+
+    <bounded-tooltip id="tooltip" for="#tooltip-bounds" class="my-tooltip-stuhltip">
+        <div id="popover-anchor"></div>
+    </bounded-tooltip>
+
+    <svg id="holiday-map" viewBox=`0 0 ${width} ${height}` style="max-height: 100vh;" class="">
+        {bundeslaenderjson.features.map(x => {
+            const bid = getId(x)
+            return <path
+                data-bundesland={bid}
+                class="bundesland-path" 
+                d={geoGenerator(x)}>
+            </path>
+        })}
+    </svg>
+</div>
+
+<style>
+    .bundesland-path{
+        fill:white;
+        stroke: black;
+        --opacity: 0.2;
+        opacity: var(--opacity)
+    }
+    .bundesland-path.is-current{
+        fill: turquoise;
+        --opacity: 0.8
+    }
+    .bundesland-path.is-hover{
+        opacity: calc(var(--opacity) + 0.2)
+    }
+    .bundesland-path.active{
+        fill: orange;
+    }
+</style>
+
+<style>
+    .my-tooltip-stuhltip{
+        background:red;
+        width: 100px;
+        height: 100px;
+    }
+</style>

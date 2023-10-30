@@ -1,0 +1,19 @@
+---
+interface Props{
+    boundingParent: string
+}
+
+const {boundingParent} = Astro.props
+---
+
+<div x-data="bounded-tooltip">
+    <slot/>
+</div>
+
+<script>
+import Alpine from "alpinejs";
+
+Alpine.data('bounded-tooltip', ()=>({
+    show: false,
+}))
+</script>

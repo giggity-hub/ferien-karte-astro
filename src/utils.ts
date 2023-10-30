@@ -18,7 +18,7 @@ type StateCallback<T> = (newValue: T, oldValue: T) => void
 export class State<T>{
     _value: T
     _subscribers: StateCallback<T>[] = []
-    constructor(initialValue:T){
+    constructor(initialValue:any){
         this._value = initialValue
     }
     subscribe(callback: StateCallback<T>){
@@ -35,6 +35,10 @@ export class State<T>{
         return this._value
     }
     set value(newValue){
+
+        if (newValue == this._value){
+            return;
+        }
         const oldValue = this._value
         this._subscribers.forEach(cb => cb(newValue, oldValue))
         this._value = newValue
@@ -51,8 +55,11 @@ export class DictState<T>{
     }
     setKey(key: string, newValue: T){
         const oldValue = this._dict[key]
-        this._subscribers.forEach(cb => cb(newValue, oldValue, key))
-        this._dict[key] = newValue
+        if (newValue != oldValue){
+            this._subscribers.forEach(cb => cb(newValue, oldValue, key))
+            this._dict[key] = newValue
+        }
+        
     }
     getKey(key: string){
         return this._dict[key]

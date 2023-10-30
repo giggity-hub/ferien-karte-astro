@@ -1,40 +1,36 @@
 ---
-import Holiday from '../components/Holiday.svelte';
-import DateInputDropdown from '../components/DateInputDropdown.astro';
-import DateInputSlider from '../components/DateInputSlider.astro'
-import {bundeslaender, years} from '../data'
 import schulferien from '../schulferien.json'
-import HolidaysForYear from '../components/HolidaysForYear.astro';
-import HolidayTable from '../components/HolidayTable.astro';
-import Map from '../components/Map.astro'
+import Map2 from '../components/Map2.astro';
+import Table from '../components/Table.astro';
+import DateDisplay from '../components/DateDisplay.astro';
+import RangeInput from '../components/RangeInput.astro'
 
-const holidays: HolidayData = schulferien
+const webComponents = await Astro.glob('../web-components/*.html')
 ---
 
 <html>
     <head>
-        <!-- <script src="public/script.js"></script> -->
+        {webComponents.map(htmlFile => <htmlFile.default/>)}
+        <script src="../scriptsschmipts/data.ts"/>
+
     </head>
-    <body>
-        <div class="flex h-screen">
-            <div class="w-full">
-                <Map/>
-            </div>
-            <div class="w-full h-full overflow-y-auto bg-green-500">
-                <DateInputDropdown/>
-                <div class="flex">
-                    <div class="w-12 bg-orange-500">
-                        {bundeslaender.map(bid => <div class="h-7 w-full text-center">{bid}</div>)}
-                    </div>
-                    <div id="track" class="relative flex-grow">
-                        <HolidayTable holidays={holidays}/>
-                        <DateInputSlider/>
-                    </div>
-                </div>
-                <div>
-                    Vielen Dank an <a href="https://www.ferienwiki.de/">Ferien Wiki</a> fuer die Daten
-                </div>
+    <body class="md:flex md:h-screen bg-gray-800">
+        <div class="sticky top-0 w-full" >
+            <Map2/>
+        </div>
+        <div style="z-index:100" class="w-full relative overflow-y-auto md:max-h-screen">
+            <div class="bg-gray-700 h-full custom-box-shadow">
+                <DateDisplay/>
+                <RangeInput>
+                    <Table/>
+                </RangeInput>
             </div>
         </div>
     </body>
 </html>
+
+<style>
+    .custom-box-shadow{
+        box-shadow: 10px solid red;
+    }
+</style>

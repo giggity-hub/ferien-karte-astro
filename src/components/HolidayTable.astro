@@ -18,18 +18,27 @@ const {holidays} = Astro.props
 <script>
 import { currentHolidays } from "../customstore";
 
-currentHolidays.subscribe((newVal, oldVal) => {
-    // console.log(newVal, oldVal);
-    if (newVal?.id){
-        document.querySelectorAll(`[data-id="${newVal.id}"]`).forEach(el => {
-            el.classList.add('active')
-        })
+document.addEventListener('currentHolidayIn', (e)=>{
+    const {bundesland, newVal, oldVal} = e.detail;
+    if (newVal){
+        document.querySelector(`[data-id="${newVal.id}"]`)?.classList.add('active')
     }
-    if (oldVal?.id){
-        document.querySelectorAll(`[data-id="${oldVal.id}"]`).forEach(el => {
-            el.classList.remove('active')
-        })
+    if (oldVal){
+        document.querySelector(`[data-id="${oldVal.id}"]`)?.classList.remove('active')
     }
-    
 })
+// currentHolidays.subscribe((newVal, oldVal) => {
+//     // console.log(newVal, oldVal);
+//     if (newVal?.id){
+//         document.querySelectorAll(`[data-id="${newVal.id}"]`).forEach(el => {
+//             el.classList.add('active')
+//         })
+//     }
+//     if (oldVal?.id){
+//         document.querySelectorAll(`[data-id="${oldVal.id}"]`).forEach(el => {
+//             el.classList.remove('active')
+//         })
+//     }
+    
+// })
 </script>

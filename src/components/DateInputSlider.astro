@@ -32,7 +32,7 @@
         e.preventDefault()
         document.addEventListener('mousemove', mouseMoveListener)
         mouseMoveListener(e)
-        console.log('listener added');
+
     }
 
     $draggableArea.addEventListener('mousedown', attachMouseMoveListener)
@@ -40,7 +40,7 @@
 
     document.addEventListener('mouseup', ()=>{
             document.removeEventListener('mousemove', mouseMoveListener)
-            console.log('listener removed');
+
         })
 
 
