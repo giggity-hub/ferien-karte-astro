@@ -4,6 +4,7 @@ import Map2 from '../components/Map2.astro';
 import Table from '../components/Table.astro';
 import DateDisplay from '../components/DateDisplay.astro';
 import RangeInput from '../components/RangeInput.astro'
+import { bundeslaender } from '../data';
 
 const webComponents = await Astro.glob('../web-components/*.html')
 ---
@@ -14,22 +15,54 @@ const webComponents = await Astro.glob('../web-components/*.html')
         <script src="../scriptsschmipts/data.ts"/>
 
     </head>
+    <style is:inline>
+        body{
+            --hue: 200;
+            --sat: 30%;
+
+            --table-row-height: 40px;
+            --table-label-height:20px;
+        }
+    </style>
     <body class="md:flex md:h-screen bg-gray-800">
         <div class="sticky top-0 w-full" >
             <Map2/>
         </div>
         <div style="z-index:100" class="w-full relative overflow-y-auto md:max-h-screen">
-            <div class="bg-gray-700 h-full custom-box-shadow">
+            <div id="right-side" class="h-full custom-box-shadow">
                 <DateDisplay/>
-                <RangeInput>
-                    <Table/>
-                </RangeInput>
+                <div class="relative">
+                    <div id="county-labels" class="absolute top-0 ">
+                        {bundeslaender.map(bid=>( 
+                            <div class="county-label">{bid}</div>
+                        ))}
+                    </div>
+                    <RangeInput>
+                        <Table/>
+                    </RangeInput>
+                </div>
+                
             </div>
         </div>
     </body>
 </html>
 
 <style>
+    #right-side{
+        background: hsl(var(--hue), 30%, 22%);
+    }
+    #county-labels{
+        --bg-color: hsla(var(--hue), 30%, 22%, .8);
+        background: var(--bg-color);
+        /* box-shadow: 0 0 10px 5px var(--bg-color); */
+        padding-top: var(--table-label-height);
+        z-index: 1;
+    }
+    .county-label{
+        height: var(--table-row-height);
+        color: white;
+    }
+
     .custom-box-shadow{
         box-shadow: 10px solid red;
     }

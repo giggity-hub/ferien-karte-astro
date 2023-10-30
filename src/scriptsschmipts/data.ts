@@ -8,20 +8,7 @@ function dateToYYYYMMDD(d: Date){
     return d.toISOString().split('T')[0]
 }
 
-
-const handler = {
-    set(obj, prop, value){
-        
-        return Reflect.set(obj, prop, value)
-    },
-    get(obj, prop, receiver){
-        return Reflect.get(obj, prop, receiver)
-    }
-}
-
-function reactive(initialValue){
-    return new Proxy(initialValue, handler)
-}
+// const holidaysSorted = 
 
 class AppState{
     $hoveredBundeslandId: State<string|null> = new State(null)
@@ -42,7 +29,14 @@ class AppState{
         }
     
         Object.entries(holidays[year]).map(([bid, holidaysForYear])=>{
-            const currentHoliday = holidaysForYear.find(holidayIsCurrent)
+            let currentHoliday = holidaysForYear.find(holidayIsCurrent)
+
+            const newMonthIsJanuary = d.getMonth() === 0;
+            const newYearIsNotFirstYear = d.getFullYear() != this.years[0]
+            if ( newMonthIsJanuary && newYearIsNotFirstYear ) {
+                const prevYear = (d.getFullYear() - 1).toString()
+                currentHoliday = currentHoliday || holidays[prevYear][bid].find(holidayIsCurrent)
+            }
             this.$currentHolidayIn.setKey(bid, currentHoliday)
         })
     }

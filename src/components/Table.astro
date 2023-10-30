@@ -9,9 +9,11 @@ const lastDate = + new Date(years[years.length -1], 11, 31)
 const widthOf24hInPx = 5;
 const milliSecondsIn24h = 86400000
 
-function scale(dateTimeStamp: number){
-    return (dateTimeStamp/milliSecondsIn24h) * widthOf24hInPx
+function scale(date: number){
+    return (date/milliSecondsIn24h) * widthOf24hInPx
 }
+
+
 function calculateStyle(h: Holiday){
     const start = +new Date(h.start)
     const end = +new Date(h.end)
@@ -23,8 +25,24 @@ function calculateStyle(h: Holiday){
     }
 }
 
+const months = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
+
 ---
-<div id="holiday-table" class="holiday-table bg-gray-600" style={{width: scale(lastDate - firstDate) + 'px'}}>
+
+<div id="holiday-table" class="holiday-table" style={{width: scale(lastDate - firstDate) + 'px'}}>
+    <div class="tick-marks">
+        {years.map(year => {
+            return months.map((month, index)=>{
+                const date = new Date(year, index, 1)
+                const style = {transform: `translateX(${scale(+date - firstDate)}px)`}
+                return <div class="tick" style={style}>
+                        <div class="tick__label">{month}</div>
+                        <div class="tick__line"></div>
+                    </div>
+            })
+
+        })}
+    </div>
     {bundeslaender.map(bid => ( 
         <div data-bundesland={bid} class="relative holiday-table__row">
             {Object.entries(holidays).map(([year, holidaysForYear])=>{
@@ -34,6 +52,7 @@ function calculateStyle(h: Holiday){
             })}
         </div>
     ))}
+        
 </div>
 <script>
     import { app } from "../scriptsschmipts/data"
@@ -75,12 +94,50 @@ function calculateStyle(h: Holiday){
 </script>
 
 <style>
+    .tick{
+        height: 100%;
+        top: 0;
+        position: absolute;
+    }
+    .tick__line{
+        /* height: 100%; */
+        height: 100%;
+        /* background: blue; */
+        color: white;
+        /* border-left: 1px solid white; */
+        box-shadow: 0px 0px 0px 1px white;
+        position: absolute;
+        color: white;
+        font-size: 20px;
+        top: 0;
+    }
+    .tick__label{
+        height: 10px;
+        font-size: 20px;
+        position: absolute;
+        top: 0;
+        color: white;
+        padding-left: 10px;
+
+    }
+    .tick-marks{
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        /* background: red; */
+        opacity: 0.5;
+    }
     .holiday-table{
+        /* height of the month labels */
+        padding-top: var(--table-label-height);
         --holiday-table-row-height: 40px;
+        cursor: pointer;
         
     }
     .holiday-table__row{
-        height: var(--holiday-table-row-height);
+        height: var(--table-row-height);
         margin-bottom: var(--holiday-table-row-gap);
         /* padding-top: 30px; */
     }
@@ -90,14 +147,18 @@ function calculateStyle(h: Holiday){
         bottom:0;
         margin: auto 0;
 
+        --bg-color: hsl(var(--hue), 30%, 50%);
         border-radius: 1px;
-        background: red;
+        background: var(--bg-color);
+        border-radius: 3px;
         --box-shadow-spread: 5px;
         height: 10px;
-        box-shadow: 0px 0px 0px var(--box-shadow-spread) #000000;
+        box-shadow: 
+        0px 0px 0px var(--box-shadow-spread) var(--bg-color),
+            0px 0px 10px 10px rgba(0,0,0,0.5);
     }
     .holiday.is-current{
-        background: blue;
+        --bg-color: hsl(var(--hue), 100%, 50%);
     }
     .holiday-table__row.is-hover{
         background: hsl(200, 100%, 10%);

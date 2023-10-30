@@ -4,31 +4,34 @@
             display: inline-block;
             position: relative;
             z-index: 100;
-            cursor: pointer
+            cursor: pointer;
+            --hue: 200;
         }
         #button{
             display: block;
-            background: red;
+            background: hsl(var(--hue), 100%, 4%);
             /* min-width: 100%; */
             min-width: 100%;
             border-radius: 5px;
             width: 100px;
             height: 30px;
             line-height: 30px;
+            color: white;
         }
         #options{
-            display: block;
+            display: none;
             transform: translateX(-50%);
             /* flex-wrap: wrap; */
             /* min-width: 100%; */
             position: absolute;
-            background: orange;
+            background: hsl(var(--hue), 100%, 4%);
             border-radius: 5px;
             overflow: hidden;
+            color: white;
         }
 
         #options div{
-            background: blue;
+            /* background: blue; */
             float: left;
             height: 30px;
         }
@@ -44,10 +47,10 @@
 
 
         #options div:hover{
-            background: lightblue;
+            background: hsl(var(--hue), 30%, 30%);
         }
         #options div.is-selected{
-            background: white;
+            background:  hsl(var(--hue), 30%, 30%);
         }
         #centerer{
             margin: 0 auto;
