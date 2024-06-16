@@ -58,18 +58,3 @@ function constructHolidays(){
     }
 }
 constructHolidays()
-
-
-
-
-import { State, DictState } from "../utils";
-
-function dateToYYYYMMDD(d: Date){
-    return d.toISOString().split('T')[0]
-}
-
-export const currentHolidays = new DictState({})
-
-// export type Bundesland = "BW"| "BY"|"BE"|"BB"|"HB"|"HH"|"HE"|"MV"|"NI"|"NW"|"RP"|"SL"|"SN"|"ST"|"SH"|"TH"
-
-export const hoveredBundesland = new State<null | BundeslandID>(null)
