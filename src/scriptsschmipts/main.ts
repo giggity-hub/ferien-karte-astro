@@ -1,7 +1,6 @@
 import IntervalTree from "@flatten-js/interval-tree";
-import schulferien from '../schulferien.json'
-import { DictState } from "../utils";
-// import {currentHolidays} from "./data"
+import '../../node_modules/normalize.css/normalize.css'
+
 import { bundeslaender } from "../data";
 import {DateInput} from "../web-components/date-input/script"
 import type { ScrollableRangeInput } from "../web-components/scrollable-range-input/script";
