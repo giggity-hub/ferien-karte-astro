@@ -1,13 +1,21 @@
 /// <reference types="astro/client" />
 
+type BundeslandID = 'BW'|'BY'|"BE"|"BB"|'HB'|'HH'|'HE'|'MV'|'NI'|'NW'|'RP'|'SL'|'SN'|'ST'|'SH'|'TH'
+
+interface Bundesland {
+    name: string,
+    coatOfArms: string,
+    id: BundeslandID
+}
+
 interface Holiday{
     holiday_type: string;
     start: string;
     end: string;
     id: string;
+    bundesland: Bundesland
 }
 
-type BundeslandID = 'BW'|'BY'|"BE"|"BB"|'HB'|'HH'|'HE'|'MV'|'NI'|'NW'|'RP'|'SL'|'SN'|'ST'|'SH'|'TH'
 
 interface BundeslandData{
     name: string;

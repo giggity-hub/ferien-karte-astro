@@ -1,0 +1,208 @@
+<template id="range-input-template">
+    <style>
+        :host{
+            /* display: block;
+            width: 100%;
+            position: relative; */
+
+            /* Overflow must be hidden because the slider can overflow when it is at 0 or 100% */
+            overflow-x: hidden;
+            /* display: flow-root; */
+            position: relative;
+            /* touch-action: none !important; */
+            user-select: none;
+           
+            
+        }
+        #scroller{
+            /* mix-blend-mode:multiply; */
+            --stop: calc(100%-50px);
+
+            /* TODO add mask overlay */
+            /* mask-position: 0 100px;
+            mask-image: linear-gradient(
+                90deg,
+                transparent,
+                transparent 40px,
+                black 60px,
+                black 50%,
+                transparent 50%,
+                transparent 100%
+            ), linear-gradient(-90deg,
+                transparent,transparent 40px,
+                black 60px,black 50%,
+                transparent 50%,transparent 100%
+            ); */
+            
+            box-sizing: border-box;
+            width: 100%;
+            overflow-x: scroll;
+            /* overflow: hidden; */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            /* font-size has to be 0 to prevent margin from inline-block element (#track) */
+            /* font-size: 0; */
+            padding-left: 50px;
+            padding-right: 50px;
+            /* background: blue; */
+        }
+
+
+        #anchor{
+            position: absolute;
+            width: 0;
+            overflow: scroll;
+            height: 100%;
+            top: 0;
+        }
+        #track{
+            /* background-color: lightblue; */
+            /* min-width: 0; */
+            width: fit-content;
+            /* position: absolute; */
+            /* touch-action: none !important; */
+        }
+        #slider{
+            pointer-events: none;
+            --highlight-color: hsla(var(--main-hue), 100%, 50%, 50%);
+            will-change: transform;
+            /* transform: translateX(50%); */
+            translate: -50%;
+            width: 1px;
+            /* box-shadow: 0 0 0 10px blue; */
+            /* height: 660px; */
+            /* flex-grow: 1; */
+            background: black;
+            /* pointer-events: none; */
+            /* height: 100%; */
+            /* height:100%; */
+            position: absolute;
+            /* left: 10px;
+            right: 10px; */
+            left: 50px;
+            top: 30px;
+            
+            /* box-shadow: 10px 10px 0 0 green; */
+            /* transform: translateX(50px); */
+            cursor: pointer;
+        }
+
+
+        /* .slider__interactive{
+            width:40px;
+            background: rgba(0,0,0,30%);
+            height: 100%;
+            transform: translateX(-50%);
+        } */
+        /* .slider__visible{
+            width:1px;
+            background: white;
+            height: 100%;
+            margin: 0 auto;
+        } */
+        .slider__head{
+            pointer-events: all;
+            background: white;
+            height: 30px;
+            width: 30px;
+            border-radius: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            position: absolute;
+            left: 50%;
+            scale: 0.8;
+            /* : translate(-50%, -100%); */
+            translate: -50% -100%;
+            transform-origin: center;
+            /* transform: translateX(); */
+        }
+
+        #slider:hover .slider__head{
+            box-shadow: 0 0 0 5px var(--highlight-color);
+        }
+        #slider:hover{
+            background: var(--primary);
+            /* border-left: 10px solid green; */
+            /* border-right: 10px solid green; */
+        }
+
+        :host([data-active="true"]) #slider{
+            background: var(--primary);
+        }
+
+        :host([data-active="true"]) .slider__head{
+            /* background: orange; */
+            scale: 1;
+            box-shadow: 0 0 0 10px var(--highlight-color) !important;
+        }
+
+        #line{
+            width: 100%;
+            cursor: pointer;
+            /* width of the cursor */
+
+            padding-left: 30px;
+            transform: translateX(-15px);
+            /* box-sizing: content-box; */
+            /* padding-left: 15px; */
+            /* background: black; */
+            box-shadow: 
+                inset 5px 5px 5px rgba(0,0,0,0.4),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.4);
+            align-self: stretch;
+            height: 30px;
+            border-radius: 50px;
+            /* display: inline; */
+            /* width: 100%; */
+
+            /* width: max-content; */
+            /* flex-grow: 1; */
+            /* display: inline-block; */
+        }
+
+        #overlay{
+            position: absolute; 
+            top: 30px;
+            width: 100%; 
+            /* background: red; */
+            /* height: 660px; */
+            /* height: 100%;  */
+            /* background: red;  */
+            pointer-events: none;
+            /* top: 0;  */
+            /* opacity: 0.8; */
+        }
+    </style>
+
+
+
+    <div id="scroller">
+        
+        <div id="track">
+                <div id="line"></div>
+                <slot name="content" id="content-slot"></slot>
+            <!-- The slider has to be inside the overflowing content. 
+                If the slider would be absolutely positioned in the host it would overlap with the scrollbar -->
+            
+        </div>
+        
+        <!-- <slot name="inside"></slot> -->
+    </div>
+    <div id="slider" draggable="false">
+        <div class="slider__interactive">
+            <div class="slider__head"></div>
+            <div class="slider__visible"></div>
+        </div>
+    </div>
+    <div id="overlay">
+        <slot name="overlay"></slot>
+    </div>
+    
+    
+   
+
+    
+</template>
+

@@ -11,7 +11,10 @@ let geoGenerator = d3.geoPath(projection)
 const getId = (x) => x.properties.id.split('-')[1]
 ---
 <script>
-import {app} from '../scriptsschmipts/data'
+import {currentHolidays, hoveredBundesland, bundeslandData} from '../scriptsschmipts/data'
+// import {BoundedTooltip} from '../web-components/bounded-tooltip/script.ts'
+import {holidaysForBundesLand, app} from '../scriptsschmipts/main'
+
 
     interface BundeslandInfo {
     fullname: string;
@@ -25,100 +28,78 @@ import {app} from '../scriptsschmipts/data'
 }
 
 
-function renderPopover(data: BundeslandInfo){
-        return `
-        <div id="popover" class="h-32 w-56 flex absolute bg-yellow-700">
-            <img class="w-10" src="${data.imagePath}">
-            <div >
-                <h3>${data.fullname}</h3>
-                    ${ data.holiday && `
-                        <div>
-                            <p>${data.holiday.holiday_type}</p>
-                            <span>${data.holiday.start}</span>
-                            <span>-</span>
-                            <span >${data.holiday.end}</span>
-                        </div>
-                    `}
-            </div>
-        </div>
-        `
-    }
+const $tooltip = document.getElementById('tooltip') as BoundedTooltip;
 
-const $tooltip = document.getElementById('tooltip')!
-const $popoverAnchor = document.getElementById('popover-anchor')!
-const $map = document.getElementById('holiday-map')!
+let $toolTipEnvoker: null | HTMLElement = null;
 
-// function togglePopoverFor(bid){
-    
-//     const data: BundeslandInfo = {
-//         fullname: 'boi',
-//         bid,
-//         imagePath: `./coat-of-arms/${bid}.svg`,
-//         holiday: app.$currentHolidayIn.getKey(bid)
-//     }
-//     $popoverAnchor.innerHTML = renderPopover(data)
-//     $tooltip.show(event)
-// }
+
+const $mapPopover = document.querySelector('map-popover') as MapPopover;
 
 
 
-// document.addEventListener('click', (e)=>{
-//     // console.log(e.target)
-//     const targetIsPath = e.target.nodeName.toLowerCase() == 'path'
-    
-//     console.log(targetIsPath)
-//     if (targetIsPath) {
-//         const bid = e.target.getAttribute('data-bundesland')
-//         togglePopoverFor(bid)
-//     }else{
-//         $tooltip.hide()
-//     }
-// })
 
-// document.querySelectorAll('path').forEach(el =>{
-//     const bid = el.getAttribute('data-bundesland')
-//     el.addEventListener('click', togglePopoverFor)
+function togglePopover(e){
+    const bid = e.currentTarget.dataset.bundesland as BundeslandID;
+    const bundesland = bundeslandData[bid]
 
-//     el.addEventListener('mouseenter', ()=>{
-//         app.$hoveredBundeslandId.value = bid;
-//     })
-// })
-
-
-let $hoveredPathElement: SVGPathElement | null = null;
-app.$hoveredBundeslandId.subscribe(bid=>{
-    $hoveredPathElement?.classList.remove('is-hover')
-    $hoveredPathElement = $map.querySelector(`[data-bundesland="${bid}"]`)
-    $hoveredPathElement?.classList.add('is-hover')
-})
-
-
-const highlightedMapElements = {}
-const $holidayMap = document.getElementById('holiday-map')
-app.$currentHolidayIn.subscribe((newVal, oldVal, bid) =>{
-    
-    if (highlightedMapElements[bid]) {
-        highlightedMapElements[bid].classList.remove('is-current')
-    }
-
-    if (newVal) {
-        const $newHolidayInMap = $holidayMap?.querySelector(`[data-bundesland="${bid}"]`)
-        $newHolidayInMap?.classList.add('is-current')
-        highlightedMapElements[bid] = $newHolidayInMap;
+    const holiday = holidaysForBundesLand[bid];
+    console.log(holidaysForBundesLand)
+    if ($tooltip.isHidden) {
+        app.selectedBundesland = bid;
+        $mapPopover.render(bundesland, holiday)
+        $tooltip.show(e)
+        $toolTipEnvoker = e.currentTarget
     }else{
-        highlightedMapElements[bid] = null;
+        // The ToolTip is already shown
+        if ($toolTipEnvoker && $toolTipEnvoker === e.currentTarget) {
+            app.selectedBundesland = null;
+            // Hide if the currentTarget has opened the tooltip
+            $tooltip.hide()
+            $toolTipEnvoker = null;
+        }else{
+            app.selectedBundesland = bid;
+            // Move to new position if currenTarget is different
+            $mapPopover.render(bundesland, holiday)
+            $tooltip.show(e)
+            $toolTipEnvoker = e.currentTarget;
+        }
+    }
+    // Ist es ein click auf das selbe oder auf ein anderes?
+    // Ist das moped geshown oder nicht?
+}
+
+
+const $paths = document.querySelectorAll('.bundesland-path');
+$paths.forEach($el =>{
+    $el.addEventListener('click', togglePopover)
+})
+
+document.addEventListener('scroll', ()=>{
+    $tooltip.hide()
+})
+
+document.addEventListener('pointerdown', (e)=>{
+    // console.log(e.target)
+    const clickOnPath = e.target.matches('.bundesland-path')
+    const clickInPopover = e.target === $tooltip || $tooltip.contains(e.target)
+    if (!clickOnPath && ! clickInPopover) {
+        $tooltip.hide()
     }
 })
+
+
 
 
 </script>
-<div id="tooltip-bounds" class="relative">
+<!-- <div id="tooltip-bounds" class="relative"><div> -->
 
-    <!-- <bounded-tooltip id="tooltip" for="#tooltip-bounds" class="my-tooltip-stuhltip">
-        <div id="popover-anchor"></div>
-    </bounded-tooltip> -->
+<div id="tooltip-bounds" style="width:100%; height:100%; display:flex;align-items: center; justify-content:center;">
+    <bounded-tooltip id="tooltip" bounds="#tooltip-bounds" for="map-popover" class="my-tooltip">
+        <map-popover></map-popover>
+        <!-- <div id="popover-anchor"></div> -->
+    </bounded-tooltip>
 
-    <svg id="holiday-map" viewBox=`0 0 ${width} ${height}` style="max-height: 100vh;" class="">
+    <svg id="holiday-map" viewBox=`0 0 ${width} ${height}` style="max-height: 100%;">
         {bundeslaenderjson.features.map(x => {
             const bid = getId(x)
             return <path
@@ -130,29 +111,52 @@ app.$currentHolidayIn.subscribe((newVal, oldVal, bid) =>{
     </svg>
 </div>
 
+
+
+
 <style>
+
+
+
+
+
+    .holiday-map{
+        background: blue;
+        fill: orange;
+    }
+    svg{
+        pointer-events: all;
+    }
     .bundesland-path{
         fill:white;
         stroke: black;
+        pointer-events: all;
         --opacity: 0.2;
-        opacity: var(--opacity)
+        opacity: var(--opacity);
+        transition: all .1s;
     }
-    .bundesland-path.is-current{
+    .bundesland-path.has-current-holiday{
         fill: turquoise;
         --opacity: 0.8
     }
     .bundesland-path.is-hover{
         opacity: calc(var(--opacity) + 0.2)
     }
+
+    .bundesland-path:hover{
+        /* fill: purple; */
+    }
+
     .bundesland-path.active{
-        fill: orange;
+        /* fill: orange; */
     }
 </style>
 
 <style>
-    .my-tooltip-stuhltip{
+    /* .my-tooltip-stuhltip{
+        position: absolute;
         background:red;
         width: 100px;
         height: 100px;
-    }
+    } */
 </style>

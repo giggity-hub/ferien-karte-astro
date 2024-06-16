@@ -1,0 +1,111 @@
+<template id="custom-select-template">
+    <style>
+        :host{
+            /* background-color: orange; */
+            position: relative;
+            /* display: flow-root; */
+            color: white;
+        }
+        .options{
+            display: none;
+            position: absolute;
+
+            list-style: none;
+            /* background: orange; */
+            /* box-sizing: content-box; */
+            
+            left: 50%;
+            z-index: 10;
+            
+            padding: .5rem;
+            border-radius: .5rem;
+            /* gap: 2px; */
+            /* cursor: pointer; */
+
+            /* Options for place="below" */
+            transform: translateX(-50%);
+            margin-top: -.5rem;
+            /* Spacing for popover */
+            
+            /* margin-bottom: 5rem; */
+            /* margin-bottom: 5rem; */
+            background-color: hsl(var(--hue), 10%, 5%);
+        }
+
+        :host([data-type="month"]) ul{
+            grid-template-columns: auto auto auto;
+        }
+        :host([data-type="month"]) li > div{
+            width: 5ch;
+            height: 4ch;
+        }
+
+        :host([data-type="day"]) ul{
+            grid-template-columns: repeat(6, auto)
+        }
+        :host([data-type="day"]) li > div{
+            width: 3ch;
+            height: 3ch;
+        }
+
+        :host([data-type="year"]) li > div{
+            width: 6ch;
+            height: 4ch;
+        }
+
+        :host([data-place="above"]) ul{
+            top: 0;
+            transform: translate(-50%, -100%);
+        }
+
+        :host([data-place="below"]) ul{
+            /* bottom: -100%; */
+            margin-top: .5rem;
+            transform: translate(-50%, 0);
+        }
+
+
+        .options.is-open{
+            display: grid;
+        }
+
+
+        li{
+            cursor: pointer;
+            padding: 1px;
+        }
+        li > div{
+            /* background: purple; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: .3em;
+        }
+
+        li:hover div{
+            /* background:orange; */
+            background: rgba(255,255,255,0.1);
+        }
+
+        li.is-selected > div{
+            background: var(--primary);
+        }
+
+        button{
+            color: white;
+            background: hsl(var(--hue), 10%, 10%);
+            border: none;
+            padding: .7em 1em;
+            border-radius: .3em;
+            cursor: pointer;
+            min-width: 5em;
+        }
+    </style>
+    <button></button>
+
+        <ul class="options">
+
+        </ul>
+
+</template>
+

@@ -238,7 +238,6 @@ customElements.define('carousel-list', CarouselList);
             this.$options.style.display = 'none'
         }
         toggleOptions(){
-            console.log(this.$options)
             const display = this.$options.style.display
             this.$options.style.display = display == 'none' ? 'block' : 'none'
         }
@@ -261,8 +260,7 @@ customElements.define('carousel-list', CarouselList);
         setEntries(obj){
             this.$options.innerHTML = ''
             this.labels = obj;
-            console.log('boiiiiiiiiiiiiiiiiiii')
-            console.log(this.labels)
+
             Object.entries(obj).forEach(([val, label])=>this.addOption(val, label))
 
             if (this.value){
@@ -394,10 +392,10 @@ class ScrollableRangeInput extends HTMLElement {
     static observedAttributes = ["min", "max", "value"];
 
     connectedCallback(){
-        console.log('boiii', this.$track.getBoundingClientRect())
+        
         if(this.hasAttribute('min')){
             this.min = this.getAttribute('min')
-            console.log('ok der boi hat minn', this.min);
+        
             
         }
         if(this.hasAttribute('max')){

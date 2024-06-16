@@ -1,48 +1,76 @@
+import schulferien from '../schulferien.json'
+
 const bundeslaender = ['BW', 'BY',"BE","BB",'HB','HH','HE','MV','NI','NW','RP','SL','SN','ST','SH','TH']
 
 
-import { holidays } from "../data";
+const bundeslandNames = {
+    "BW":  "Baden-Württemberg",
+    "BY":  "Bayern",
+    "BE":  "Berlin",
+    "BB":  "Brandenburg",
+    "HB":  "Bremen",
+    "HH":  "Hamburg",
+    "HE":  "Hessen",
+    "MV":  "Mecklenburg-Vorpommern",
+    "NI":  "Niedersachsen",
+    "NW":  "Nordrhein-Westfalen",
+    "RP":  "Rheinland-Pfalz",
+    "SL":  "Saarland",
+    "SN":  "Sachsen",
+    "ST":  "Sachsen-Anhalt",
+    "SH":  "Schleswig-Holstein",
+    "TH":  "Thüringen"
+}
+
+type Bundesland = {
+    name: string,
+    coatOfArms: string,
+    id: BundeslandID
+}
+
+function generateBundeslandData(): Record<BundeslandID, Bundesland> {
+    const res: Record<BundeslandID, Bundesland> = {} as Record<BundeslandID, Bundesland>;
+    (Object.entries(bundeslandNames) as [BundeslandID, string][]).forEach(([bid, name]) => {
+        res[bid] = {
+            id: bid,
+            name,
+            coatOfArms: `./coat-of-arms/${bid}.svg`
+        };
+    });
+    return res;
+}
+export const bundeslandData: Record<BundeslandID, Bundesland> = generateBundeslandData();
+
+
+
+export const holidayLookup: {[hid: string]: Holiday} = {}
+export const holidays: Holiday[] = []
+
+function constructHolidays(){
+    for (const [year, holidaysForYear] of Object.entries(schulferien)) {
+        for (const [bundesland, holidaysByYearAndBundesland] of Object.entries(holidaysForYear)){
+            for (const holiday of holidaysByYearAndBundesland) {
+                holiday.bundesland = bundeslandData[bundesland]
+                holidayLookup[holiday.id] = holiday;
+                holidays.push(holiday)
+
+            }
+        }
+    }
+}
+constructHolidays()
+
+
+
+
 import { State, DictState } from "../utils";
 
 function dateToYYYYMMDD(d: Date){
     return d.toISOString().split('T')[0]
 }
 
-// const holidaysSorted = 
+export const currentHolidays = new DictState({})
 
-class AppState{
-    $hoveredBundeslandId: State<string|null> = new State(null)
-    $selectedDate: State<Date> = new State(new Date())
-    $currentHolidayIn = new DictState({})
+// export type Bundesland = "BW"| "BY"|"BE"|"BB"|"HB"|"HH"|"HE"|"MV"|"NI"|"NW"|"RP"|"SL"|"SN"|"ST"|"SH"|"TH"
 
-    years
-
-    constructor(holidays: HolidayData){
-        // this.years = Object.keys(holidays).toSorted().map(x => parseInt(x))
-        this.years = [2023, 2024, 2025]
-        this.$selectedDate.listen(this.calculateCurrentHolidays.bind(this))
-    }
-    calculateCurrentHolidays(d: Date){
-        const dateIsoString = dateToYYYYMMDD(d)
-        const year = dateIsoString.slice(0, 4)
-        function holidayIsCurrent(h: Holiday){
-            return (h.start <= dateIsoString) && (dateIsoString <= h.end)
-        }
-    
-        Object.entries(holidays[year]).map(([bid, holidaysForYear])=>{
-            let currentHoliday = holidaysForYear.find(holidayIsCurrent)
-
-            const newMonthIsJanuary = d.getMonth() === 0;
-            const newYearIsNotFirstYear = d.getFullYear() != this.years[0]
-            if ( newMonthIsJanuary && newYearIsNotFirstYear ) {
-                const prevYear = (d.getFullYear() - 1).toString()
-                currentHoliday = currentHoliday || holidays[prevYear][bid].find(holidayIsCurrent)
-            }
-            this.$currentHolidayIn.setKey(bid, currentHoliday)
-        })
-    }
-
-}
-
-
-export const app = new AppState(holidays)
+export const hoveredBundesland = new State<null | BundeslandID>(null)

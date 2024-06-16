@@ -1,0 +1,57 @@
+<template id="map-popover-template">
+    <image data-property="coatOfArms"></image>
+    <div style="">
+        <h3 data-property="name" >Bundesland</h3>
+        <div class="holiday-data">
+            <p data-property="holidayType" >Ferientyp</p>
+            <p>Von <span data-property="holidayStart">20.01.2000</span><br>
+            bis <span data-property="holidayEnd">20.03.2015</span></p>
+        </div>
+        <div class="no-holiday-data">
+            Keine Ferien
+        </div>
+    </div>
+</template>
+
+<style>
+    .holiday-data, .no-holiday-data{
+        display: none;
+    }
+    map-popover.has-current-holiday .holiday-data{
+        display: block;
+    }
+    map-popover:not(.has-current-holiday) .no-holiday-data{
+        display: block;
+    }
+
+
+
+    map-popover{
+        display: flex;
+        background: hsl(var(--hue), 10%, 5%);
+        width: max-content;
+        color: white;
+        border-radius: 10px;
+        padding: 10px;
+        gap: 10px;
+    }
+    map-popover h3{
+        /* background: orange; */
+    }
+
+    .my-tooltip img{
+        /* float: left; */
+        width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+    }
+    .my-tooltip div{
+        /* padding-left: 10px; */
+        /* float:left; */
+    }
+
+    .my-tooltip h3{
+        margin: 0;
+        
+    }
+    </style>

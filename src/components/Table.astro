@@ -1,8 +1,6 @@
 ---
 import { holidays, bundeslaender } from "../data";
-import { dateToPercentageOfYearFactory } from "../utils";
-
-// const years = Object.keys(holidays).toSorted().map(x => parseInt(x))
+// TODO don't hardcode the years
 const years = [2023, 2024, 2025]
 const firstDate = + new Date(years[0], 0, 1)
 const lastDate = + new Date(years[years.length -1], 11, 31)
@@ -30,7 +28,16 @@ const months = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep',
 
 ---
 
-<div id="holiday-table" class="holiday-table" style={{width: scale(lastDate - firstDate) + 'px'}}>
+<!-- The labels which are oveerlayed on the left -->
+<div id="county-labels" slot="overlay">
+    {bundeslaender.map(bid=>( 
+        <div class="county-label">{bid}</div>
+    ))}
+</div>
+
+
+<div slot="content"  id="holiday-table" class="holiday-table" style={{width: scale(lastDate - firstDate) + 'px'}}>
+
     <div class="tick-marks">
         {years.map(year => {
             return months.map((month, index)=>{
@@ -41,60 +48,73 @@ const months = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep',
                         <div class="tick__line"></div>
                     </div>
             })
-
         })}
     </div>
     {bundeslaender.map(bid => ( 
-        <div data-bundesland={bid} class="relative holiday-table__row">
+        <div data-bundesland={bid} class="holiday-table__row">
             {Object.entries(holidays).map(([year, holidaysForYear])=>{
                 return holidaysForYear[bid].map(hol => (
-                    <div  data-holiday-id={hol.id} class="holiday absolute bg-red-500" style={calculateStyle(hol)}></div>
+                    <div  data-holiday-id={hol.id} class="holiday" style={calculateStyle(hol)}></div>
                 ))
             })}
         </div>
     ))}
         
 </div>
-<script>
-    import { app } from "../scriptsschmipts/data"
 
-    const $elements = document.getElementsByClassName('holiday-table__row') as HTMLCollectionOf<HTMLDivElement>
-    for (const element of $elements) {
-        const bid = element.getAttribute('data-bundesland')
-        element.addEventListener('mouseenter', (e)=>{
-            app.$hoveredBundeslandId.value = bid;
-        })
+<bounded-tooltip bounds="scrollable-range-input" for="#table-tooltip">
+    <div id="#table-tooltip"></div>
+</bounded-tooltip>
+
+
+<script>
+import { holidayLookup } from "../scriptsschmipts/data";
+
+const $tableTooltip = document.querySelector('#table-tooltip')
+
+    function togglePopover(e){
+        const hid = e.currentTarget.dataset.holidayId
+        const holiday = holidayLookup[hid];
+
+        console.log($tableTooltip)
+        $tableTooltip.textContent = holiday.holiday_type + holiday.start + holiday.end;
+
+        // console.log(e.currentTarget.dataset['holiday-id'])
     }
 
-    const $table = document.getElementById('holiday-table')!
-    let $hoveredRow: HTMLElement | null = null;
-    app.$hoveredBundeslandId.subscribe(newVal=>{
-        $hoveredRow?.classList.remove('is-hover')
-        $hoveredRow = $table.querySelector(`[data-bundesland="${newVal}"]`)
-        $hoveredRow?.classList.add('is-hover')
+    const $holidays = document.querySelectorAll('.holiday');
+    $holidays.forEach($el =>{
+        $el.addEventListener('click', togglePopover)
     })
-
-    const highlightedTableElements = {}
-    app.$currentHolidayIn.subscribe((newVal, oldVal, bid)=>{
-        if (highlightedTableElements[bid]) {
-            highlightedTableElements[bid].classList.remove('is-current')
-        }
-
-        if (newVal) {
-            const $newHolidayInTable = $table?.querySelector(`[data-holiday-id="${newVal.id}"]`)
-            $newHolidayInTable?.classList.add('is-current')
-            highlightedTableElements[bid] = $newHolidayInTable;
-        }else{
-            highlightedTableElements[bid] = null;
-        }
-    })
-
-
-
-
 </script>
 
 <style>
+    #county-labels{
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        /* --bg-color: hsla(var(--hue), 30%, 22%, .8); */
+        background: rgba(0,0,0,0.3);
+        /* box-shadow: 0 0 10px 5px var(--bg-color); */
+        /* padding-top: var(--table-label-height); */
+        /* z-index: 1; */
+        width: 50px;
+        /* display: table */
+        display: grid;
+        justify-items: center;
+        align-items: center
+    }
+    .county-label{
+        /* height: var(--table-row-height); */
+        color: white;
+        flex-grow: 1;
+        display: table-cell;
+        /* vertical-align: middle; */
+    }
+
+
+
     .tick{
         height: 100%;
         top: 0;
@@ -134,14 +154,22 @@ const months = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep',
         /* height of the month labels */
         padding-top: var(--table-label-height);
         --holiday-table-row-height: 40px;
-        cursor: pointer;
+        /* cursor: pointer; */
+        position: relative;
         
     }
+
     .holiday-table__row{
+        position: relative;
         height: var(--table-row-height);
         margin-bottom: var(--holiday-table-row-gap);
         /* padding-top: 30px; */
     }
+
+    .holiday-table__row.is-hover{
+        background-color: rgba(255,255,255, 0.5);
+    }
+
     .holiday{
         /* transform: translateY(calc(var(--holiday-table-row-height)/2)); */
         top: 0;
@@ -157,11 +185,11 @@ const months = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep',
         box-shadow: 
         0px 0px 0px var(--box-shadow-spread) var(--bg-color),
             0px 0px 10px 10px rgba(0,0,0,0.5);
+
+        position: absolute
     }
-    .holiday.is-current{
+    .holiday.is-current-holiday{
         --bg-color: hsl(var(--hue), 100%, 50%);
     }
-    .holiday-table__row.is-hover{
-        background: hsl(200, 100%, 10%);
-    }
+
 </style>

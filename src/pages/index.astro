@@ -6,64 +6,131 @@ import DateDisplay from '../components/DateDisplay.astro';
 import RangeInput from '../components/RangeInput.astro'
 import { bundeslaender } from '../data';
 
-const webComponents = await Astro.glob('../web-components/*.html')
+
+const templates = await Astro.glob('../web-components/*/index.html');
 ---
 
 <html>
     <head>
-        {webComponents.map(htmlFile => <htmlFile.default/>)}
-        <script src="../scriptsschmipts/data.ts"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
 
+        {templates.map(template => <template.default/>)}
+
+        <script>
+
+        </script>
+
+        <script src="../web-components/date-input/script.ts"/>
+        <script src="../web-components/custom-select/script.ts"></script>
+        <script src="../web-components/scrollable-range-input/script.ts"></script>
+        <script src="../web-components/map-popover/script.ts"></script>
+        <script src="../web-components/bounded-tooltip/script.ts"></script>
+
+        <script src="../scriptsschmipts/main.js" ></script>
+
+        <link rel="stylesheet" href="../../node_modules/normalize.css/normalize.css">
+        
     </head>
     <style is:inline>
-        body{
+        :root{
             --hue: 200;
-            --sat: 30%;
+           
+            --main-hue: 200;
 
+            --primary: hsl(var(--hue), 100%, 50%);
+
+            /* TODO remove this */
             --table-row-height: 40px;
             --table-label-height:20px;
         }
+        body{
+            font-family: sans-serif;
+        }
+        *{
+            box-sizing: border-box;
+        }
+
     </style>
-    <body class="md:flex md:h-screen bg-gray-800">
-        <div class="sticky top-0 w-full" >
+    <body >
+        <div class="map-container">
             <Map2/>
         </div>
-        <div style="z-index:100" class="w-full relative overflow-y-auto md:max-h-screen">
-            <div id="right-side" class="h-full custom-box-shadow">
-                <DateDisplay/>
+
+            <div class="table-container" >
+
+                <date-input id="date-input-custom" ></date-input>
+ 
                 <div class="relative">
-                    <div id="county-labels" class="absolute top-0 ">
-                        {bundeslaender.map(bid=>( 
-                            <div class="county-label">{bid}</div>
-                        ))}
-                    </div>
-                    <RangeInput>
+                    
+                    <scrollable-range-input 
+                        value="app.selectedDateTimeStamp"
+                        min="app.minDateTimeStamp"
+                        max="app.maxDateTimeStamp"
+                        id="my-range-input"> 
                         <Table/>
-                    </RangeInput>
+                        
+                    </scrollable-range-input>
                 </div>
                 
             </div>
-        </div>
+
     </body>
 </html>
 
+<script>
+
+
+</script>
+
 <style>
-    #right-side{
-        background: hsl(var(--hue), 30%, 22%);
-    }
-    #county-labels{
-        --bg-color: hsla(var(--hue), 30%, 22%, .8);
-        background: var(--bg-color);
-        /* box-shadow: 0 0 10px 5px var(--bg-color); */
-        padding-top: var(--table-label-height);
-        z-index: 1;
-    }
-    .county-label{
-        height: var(--table-row-height);
-        color: white;
+    body{
+        display: flex;
+        flex-wrap: wrap;
+        background: hsl(var(--hue) 10% 10%);
+        min-height: 100vh;
+        /* position: relative; */
     }
 
-    .custom-box-shadow{
-        box-shadow: 10px solid red;
+    .table-container{
+        flex-basis: 60%;
+        align-self: stretch;
+        flex-grow: 1;
+        /* min-width: 400px; */
+        /* max-width: 100%; */
+        min-width: 0;
+        background-color: rgba(250, 250, 250,0.1);
+        /* filter: url(#blur-filter); */
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+        /* position: relative;
+        isolation: isolate; */
     }
+
+    .map-container{
+
+        min-width: min(400px, 100%);
+        /* Do not allow full height so that the table is always in sight */
+        max-height: 80vh;
+   
+        flex-basis: 40%;
+        flex-grow: 1;
+        
+        /* Place behind the table */
+        position:sticky;
+        top: 0;
+        /* z-index: -1; */
+
+        /* Center the Map SVG inside */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    #right-side{
+        /* background: hsl(var(--hue), 30%, 22%); */
+    }
+
+
 </style>
