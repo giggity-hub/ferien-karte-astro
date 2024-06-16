@@ -1,7 +1,6 @@
 import schulferien from '../schulferien.json'
 
-const bundeslaender = ['BW', 'BY',"BE","BB",'HB','HH','HE','MV','NI','NW','RP','SL','SN','ST','SH','TH']
-
+export const bundeslaender = ['BW', 'BY',"BE","BB",'HB','HH','HE','MV','NI','NW','RP','SL','SN','ST','SH','TH']
 
 const bundeslandNames = {
     "BW":  "Baden-Württemberg",

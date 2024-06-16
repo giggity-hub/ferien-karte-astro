@@ -1,10 +1,10 @@
 import IntervalTree from "@flatten-js/interval-tree";
 import '../../node_modules/normalize.css/normalize.css'
 
-import { bundeslaender } from "../data";
+// import { bundeslaender } from "../data";
 import {DateInput} from "../web-components/date-input/script"
 import type { ScrollableRangeInput } from "../web-components/scrollable-range-input/script";
-import { bundeslandData, holidays } from "./data";
+import { bundeslandData, holidays, bundeslaender } from "./data";
 
 console.log(holidays, "schmolidayss")
 
