@@ -1,18 +1,16 @@
 import IntervalTree from "@flatten-js/interval-tree";
 import '../../node_modules/normalize.css/normalize.css'
-
-// import { bundeslaender } from "../data";
 import {DateInput} from "../web-components/date-input/script"
 import type { ScrollableRangeInput } from "../web-components/scrollable-range-input/script";
 import { bundeslandData, holidays, bundeslaender } from "./data";
 
-console.log(holidays, "schmolidayss")
-
-
-
-
 class App{
     selectedBundesland: BundeslandID | null = null;
+    maxDate: Date;
+    minDateTimeStamp: number;
+    maxDateTimeStamp: number;
+    selectedDateTimeStamp: number;
+    selectedDateIso: string;
     constructor(){
         this.maxDate = new Date(2025, 11, 31)
         this.minDateTimeStamp = +new Date(2023, 0, 1)
@@ -22,31 +20,34 @@ class App{
     }
 }
 
-
 export const app = new App();
 
 
-// HOVER LOGIC
-let hoveredBundeslandElements = []
+function addHoverListeners(){
+    let hoveredBundeslandElements: HTMLElement[] = []
 
-function mouseEnterHandler(e){
-    console.log('ooo')
-    if (hoveredBundeslandElements) {
-        mouseLeaveHandler(e)
+    function mouseLeaveHandler(e: MouseEvent){
+        hoveredBundeslandElements.forEach($el => $el.classList.remove('is-hover'))
     }
-    const bid = e.currentTarget.dataset.bundesland
-    hoveredBundeslandElements = document.querySelectorAll(`[data-bundesland=${bid}]`)
-    hoveredBundeslandElements.forEach($el=> $el.classList.add('is-hover'))
+
+    function mouseEnterHandler(e: MouseEvent){
+        if (hoveredBundeslandElements) {
+            mouseLeaveHandler(e)
+        }
+
+        if (e.currentTarget && e.currentTarget instanceof HTMLElement || e.currentTarget instanceof SVGElement) {
+            const bid = e.currentTarget.dataset.bundesland
+            hoveredBundeslandElements = Array.from(document.querySelectorAll(`[data-bundesland=${bid}]`))
+            hoveredBundeslandElements.forEach($el=> $el.classList.add('is-hover'))
+        }
+    }
+    
+    const $bundeslandDataStuff = Array.from(document.querySelectorAll(`[data-bundesland]`)) as HTMLElement[]
+    $bundeslandDataStuff.forEach($el =>{
+        $el.addEventListener('mouseenter', mouseEnterHandler)
+        $el.addEventListener('mouseleave', mouseLeaveHandler)
+    })
 }
-
-function mouseLeaveHandler(e){
-    hoveredBundeslandElements.forEach($el => $el.classList.remove('is-hover'))
-    // hoveredBundesland = null;
-}
-
-
-
-
 
 
 const tree = new IntervalTree<Holiday>()
@@ -58,13 +59,13 @@ holidays.forEach(h =>{
 
 
 function main(){
-    
+
+    addHoverListeners();
+
+
+
     const $tooltip = document.getElementById('tooltip') as BoundedTooltip;
-    const $bundeslandDataStuff = document.querySelectorAll(`[data-bundesland]`)
-    $bundeslandDataStuff.forEach($el =>{
-        $el.addEventListener('mouseenter', mouseEnterHandler)
-        $el.addEventListener('mouseleave', mouseLeaveHandler)
-    })
+    
 
 
     
