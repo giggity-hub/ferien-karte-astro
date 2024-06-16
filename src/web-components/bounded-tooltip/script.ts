@@ -1,13 +1,4 @@
-/**
- * Repeats some text a given number of times.
- *
- * @param {number} min
- * @param {number} max
- * @param {number} number
- */
-function clamp(min, max, number) {
-return Math.min(Math.max(number, min), max);
-};
+import { clamp } from "../../utils";
 
 export class BoundedTooltip extends HTMLElement {
     isHidden: boolean = true;

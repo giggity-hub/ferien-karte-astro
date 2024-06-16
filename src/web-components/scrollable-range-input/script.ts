@@ -1,20 +1,6 @@
 
-/**
- * Repeats some text a given number of times.
- *
- * @param {number} min
- * @param {number} max
- * @param {number} number
- */
-function clamp(min, max, number) {
-return Math.min(Math.max(number, min), max);
-};
+import { clamp, convertRange } from "../../utils";
 
-function convertRange( value, domain, range ) { 
-    return ( value - domain[ 0 ] ) * ( range[ 1 ] - range[ 0 ] ) / ( domain[ 1 ] - domain[ 0 ] ) + range[ 0 ];
-}
-
-// convertRange( 328.17, [ 300.77, 559.22 ], [ 1, 10 ] );
 
 export class ScrollableRangeInput extends HTMLElement {
     $track
@@ -148,12 +134,6 @@ export class ScrollableRangeInput extends HTMLElement {
         }
     }
 
-    // parseAttributes() {
-    //     this.min = parseFloat(this.getAttribute('min'))
-    //     this.max = parseFloat(this.getAttribute('max'))
-    //     this.value = parseFloat(this.getAttribute('value'))
-    // }
-
     connectedCallback(){
         // this.boundingClientRect = this.getBoundingClientRect()
         this.resizeHandler()
@@ -205,22 +185,6 @@ export class ScrollableRangeInput extends HTMLElement {
         }
         this.doStuff(v)
     }
-
-
-    // attributeChangedCallback(name, oldValue, newValue){
-    //     console.log('attributechangedcallback')
-    //     switch (name) {
-    //         case 'min':
-    //             this.min = parseFloat(newValue)
-    //             break;
-    //         case 'max':
-    //             this.max = parseFloat(newValue)
-    //         case 'value':
-    //         this.value = parseFloat(newValue)
-    //         default:
-    //             break;
-    //     }
-    // }
 
     isAnimationFrameRequested = false;
     lastMouseEvent = null;
