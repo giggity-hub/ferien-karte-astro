@@ -22,7 +22,6 @@ class App{
 
 export const app = new App();
 
-
 function addHoverListeners(){
     let hoveredBundeslandElements: HTMLElement[] = []
 
@@ -49,11 +48,6 @@ function addHoverListeners(){
     })
 }
 
-
-
-
-
-
 const tree = new IntervalTree<Holiday>()
 holidays.forEach(h =>{
     const start = +new Date(h.start)
@@ -79,7 +73,6 @@ function main(){
     $rangeInput.value = app.selectedDateTimeStamp;
 
 
-
     $rangeInput?.addEventListener('change', (e)=>{
         $tooltip.hide()
         $di.value = new Date(e.target.value)
@@ -97,19 +90,10 @@ function main(){
 document.addEventListener('DOMContentLoaded', main)
 
 
-
-let currentBundeslaender = [];
-
-
-
-export const holidaysForBundesLand = Object.fromEntries(bundeslaender.map(bid => [bid, null])) as Record<BundeslandID, Holiday|null>
-
-function setValuesToNull(obj: object) {
-    for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            obj[key] = null;
-        }
-    }
+function setAllCurrentHolidaysToNull(b: Bundeslaender) {
+    Object.values(b).forEach(b=>{
+        b.currentHoliday = null;
+    })
 }
 
 
@@ -144,14 +128,14 @@ function updateShit(dateTimeStamp: number){
     function callback(holiday: Holiday){
         currentHolidays.push(holiday)
         bundeslaenderWithCurrentHoliday.push(holiday.bundesland)
-        holidaysForBundesLand[holiday.bundesland.id] = holiday
+        holiday.bundesland.currentHoliday = holiday;
     }
     res.forEach(callback)
 
     styleBundeslaenderWithCurrentHoliday(bundeslaenderWithCurrentHoliday)
     styleCurrentHolidays(currentHolidays)
 
-    setValuesToNull(holidaysForBundesLand)
+    setAllCurrentHolidaysToNull(bundeslandData)
     res.forEach(callback)
 }
 

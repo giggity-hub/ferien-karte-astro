@@ -2,11 +2,11 @@
 
 type BundeslandID = 'BW'|'BY'|"BE"|"BB"|'HB'|'HH'|'HE'|'MV'|'NI'|'NW'|'RP'|'SL'|'SN'|'ST'|'SH'|'TH'
 
-interface Bundesland {
-    name: string,
-    coatOfArms: string,
-    id: BundeslandID
-}
+// interface Bundesland {
+//     name: string,
+//     coatOfArms: string,
+//     id: BundeslandID
+// }
 
 interface Holiday{
     holiday_type: string;
@@ -17,9 +17,9 @@ interface Holiday{
 }
 
 
-interface BundeslandData{
-    name: string;
-}
+// interface BundeslandData{
+//     name: string;
+// }
 
 type Bundeslaender = Record<BundeslandID, BundeslandData>
 

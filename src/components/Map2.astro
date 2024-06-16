@@ -12,8 +12,6 @@ const getId = (x) => x.properties.id.split('-')[1]
 ---
 <script>
 import {bundeslandData} from '../scriptsschmipts/data'
-import {holidaysForBundesLand, app} from '../scriptsschmipts/main'
-
 
     interface BundeslandInfo {
     fullname: string;
@@ -41,8 +39,7 @@ function togglePopover(e){
     const bid = e.currentTarget.dataset.bundesland as BundeslandID;
     const bundesland = bundeslandData[bid]
 
-    const holiday = holidaysForBundesLand[bid];
-    console.log(holidaysForBundesLand)
+    const holiday = bundesland.currentHoliday;
     if ($tooltip.isHidden) {
         app.selectedBundesland = bid;
         $mapPopover.render(bundesland, holiday)

@@ -24,7 +24,8 @@ const bundeslandNames = {
 type Bundesland = {
     name: string,
     coatOfArms: string,
-    id: BundeslandID
+    id: BundeslandID,
+    currentHoliday: Holiday|null
 }
 
 function generateBundeslandData(): Record<BundeslandID, Bundesland> {
@@ -33,12 +34,16 @@ function generateBundeslandData(): Record<BundeslandID, Bundesland> {
         res[bid] = {
             id: bid,
             name,
-            coatOfArms: `./coat-of-arms/${bid}.svg`
+            coatOfArms: `./coat-of-arms/${bid}.svg`,
+            currentHoliday: null
         };
     });
     return res;
 }
-export const bundeslandData: Record<BundeslandID, Bundesland> = generateBundeslandData();
+
+type Bundeslaender = Record<BundeslandID, Bundesland>
+
+export const bundeslandData: Bundeslaender = generateBundeslandData();
 
 
 
