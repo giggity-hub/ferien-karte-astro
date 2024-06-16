@@ -50,6 +50,10 @@ function addHoverListeners(){
 }
 
 
+
+
+
+
 const tree = new IntervalTree<Holiday>()
 holidays.forEach(h =>{
     const start = +new Date(h.start)
@@ -62,12 +66,7 @@ function main(){
 
     addHoverListeners();
 
-
-
     const $tooltip = document.getElementById('tooltip') as BoundedTooltip;
-    
-
-
     
 
     const $di: DateInput = document.querySelector('#date-input-custom')
@@ -79,33 +78,26 @@ function main(){
     $rangeInput.max = app.maxDateTimeStamp;
     $rangeInput.value = app.selectedDateTimeStamp;
 
-    // $rangeInput?.setAttribute('min', app.minDateTimeStamp.toString())
-    // $rangeInput?.setAttribute('max', app.maxDateTimeStamp.toString())
-    // $rangeInput?.setAttribute('value', (app.selectedDateTimeStamp).toString())
 
 
+    $rangeInput?.addEventListener('change', (e)=>{
+        $tooltip.hide()
+        $di.value = new Date(e.target.value)
+        updateShit(e.target.value)
+    })
 
-$rangeInput?.addEventListener('change', (e)=>{
-    $tooltip.hide()
-    console.log($di.value)
-    $di.value = new Date(e.target.value)
-    updateShit(e.target.value)
-})
-
-
-
-$di?.addEventListener('change', (e)=>{
-    const dateTimeStamp = + new Date(e.target.value);
-    $rangeInput.value = dateTimeStamp
-    updateShit(dateTimeStamp)
-})
+    $di?.addEventListener('change', (e)=>{
+        const dateTimeStamp = + new Date(e.target.value);
+        $rangeInput.value = dateTimeStamp
+        updateShit(dateTimeStamp)
+    })
 }
 
 
 document.addEventListener('DOMContentLoaded', main)
 
 
-let currentHolidays = [];
+
 let currentBundeslaender = [];
 
 
@@ -121,48 +113,46 @@ function setValuesToNull(obj: object) {
 }
 
 
-function updateShit(dateTimeStamp){
+function groupedClassToggle<T>(toggleClass: string, queryGenerator: (el:T) => string){
+    // Constructs a Function that does the following
+    // Given a list of Objects apply a CSS Class to all elements who correspond to those objects (as specified by queryGenerator)
+    // Remove the CSS Class where previously applied
+    let elementsWithClassAdded: (HTMLElement | SVGElement)[] = []
+
+    return (activeElements: T[])=>{
+        elementsWithClassAdded.forEach($el => {$el.classList.remove(toggleClass)})
+        elementsWithClassAdded = []
+        
+        activeElements.forEach(el =>{
+            const query = queryGenerator(el)
+            const $nodes = document.querySelectorAll(query) as NodeListOf<HTMLElement|SVGElement>
+            $nodes.forEach($b => $b.classList.add(toggleClass))
+            elementsWithClassAdded.push(...$nodes)
+        })
+    }
+}
+
+const styleBundeslaenderWithCurrentHoliday = groupedClassToggle<Bundesland>('has-current-holiday', (b:Bundesland)=> `[data-bundesland="${b.id}"]`)
+const styleCurrentHolidays = groupedClassToggle<Holiday>('is-current-holiday', (b:Holiday)=> `[data-holiday-id="${b.id}"]`)
+
+function updateShit(dateTimeStamp: number){
     const res = tree.search([dateTimeStamp, dateTimeStamp])
 
-    const activeHolidayIDs = new Set()
-    const activeBundeslandIDs = new Set()
+    const currentHolidays: Holiday[] = []
+    const bundeslaenderWithCurrentHoliday: Bundesland[] = []
 
     function callback(holiday: Holiday){
-        activeHolidayIDs.add(holiday.id)
-        activeBundeslandIDs.add(holiday.bundesland.id)
+        currentHolidays.push(holiday)
+        bundeslaenderWithCurrentHoliday.push(holiday.bundesland)
         holidaysForBundesLand[holiday.bundesland.id] = holiday
     }
-
-    
-    setValuesToNull(holidaysForBundesLand)
     res.forEach(callback)
 
-    
+    styleBundeslaenderWithCurrentHoliday(bundeslaenderWithCurrentHoliday)
+    styleCurrentHolidays(currentHolidays)
 
-    currentHolidays.forEach($el => {
-        $el.classList.remove('is-current-holiday')
-    })
-    currentHolidays = []
-
-    activeHolidayIDs.forEach(hid => {
-        const $holidays = document.querySelectorAll(`[data-holiday-id="${hid}"]`)
-        $holidays.forEach($h => $h.classList.add('is-current-holiday'))
-        currentHolidays.push(...$holidays)
-    })
-
-
-    // set bids
-    currentBundeslaender.forEach($el => {
-        $el.classList.remove('has-current-holiday')
-    })
-    currentBundeslaender = []
-
-    activeBundeslandIDs.forEach(bid =>{
-        const $bundslndr = document.querySelectorAll(`[data-bundesland="${bid}"]`)
-        // console.log($bundslndr)
-        $bundslndr.forEach($b => $b.classList.add('has-current-holiday'))
-        currentBundeslaender.push(...$bundslndr)
-    })
+    setValuesToNull(holidaysForBundesLand)
+    res.forEach(callback)
 }
 
 
